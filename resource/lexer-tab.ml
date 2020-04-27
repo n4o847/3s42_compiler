@@ -1,34 +1,34 @@
-(* Ê¸»úÎó¤ò°Ê²¼¤Î¥È¡¼¥¯¥óÎó¤ËÊ¬²ò¤·¤ÆÉ½¼¨¤¹¤ë¥×¥í¥°¥é¥à¡§Á«°Üµ¬Â§¤ò¥Æ¡¼¥Ö¥ë²½
+(* æ–‡å­—åˆ—ã‚’ä»¥ä¸‹ã®ãƒˆãƒ¼ã‚¯ãƒ³åˆ—ã«åˆ†è§£ã—ã¦è¡¨ç¤ºã™ã‚‹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ï¼šé·ç§»è¦å‰‡ã‚’ãƒ†ãƒ¼ãƒ–ãƒ«åŒ–
    EQ:  =    LEQ: <=   LT: <   PLUS: +  IF: if THEN: then  
    INT: 0 |([1-9][0-9]* )   ID: [a-z]([a-z]|[0-9])*
 *)
-(* ¥È¡¼¥¯¥ó¤ÎÄêµÁ *)
+(* ãƒˆãƒ¼ã‚¯ãƒ³ã®å®šç¾© *)
 type token = INVALID | EQ | LEQ | LT | PLUS | IF | THEN | INT | ID
 
-(* ÆşÎÏÊ¸»úÎó¤ò³ÊÇ¼¤·¤Æ¤ª¤¯¾ì½ê *)
+(* å…¥åŠ›æ–‡å­—åˆ—ã‚’æ ¼ç´ã—ã¦ãŠãå ´æ‰€ *)
 let input_buffer = ref ""  
 
-(* ¸½ºßÆÉ¤ó¤Ç¤¤¤ëlexeme(¸ì×ÃÁÇ¡Ë¤ÎÀèÆ¬°ÌÃÖ *)
+(* ç¾åœ¨èª­ã‚“ã§ã„ã‚‹lexeme(èªå½™ç´ ï¼‰ã®å…ˆé ­ä½ç½® *)
 let pos_start = ref 0 (* start of the current lexeme *)
 
-(* ¤³¤ì¤«¤éÆÉ¤àÊ¸»ú¤Î°ÌÃÖ *)
+(* ã“ã‚Œã‹ã‚‰èª­ã‚€æ–‡å­—ã®ä½ç½® *)
 let pos_current = ref 0 (* current position *)
 
-(* ¸½ºßÆÉ¤ó¤Ç¤¤¤ëlexemeÃæ¤ÇºÇ¸å¤ËÇ§¼±¤µ¤ì¤¿¥È¡¼¥¯¥ó *)
+(* ç¾åœ¨èª­ã‚“ã§ã„ã‚‹lexemeä¸­ã§æœ€å¾Œã«èªè­˜ã•ã‚ŒãŸãƒˆãƒ¼ã‚¯ãƒ³ *)
 let last_token = ref INVALID (* last valid token *)
 
-(* ¸½ºßÆÉ¤ó¤Ç¤¤¤ëlexemeÃæ¤ÇºÇ¸å¤ËÇ§¼±¤µ¤ì¤¿¥È¡¼¥¯¥ó¤Î¼¡¤ÎÊ¸»ú¤Î°ÌÃÖ *)
+(* ç¾åœ¨èª­ã‚“ã§ã„ã‚‹lexemeä¸­ã§æœ€å¾Œã«èªè­˜ã•ã‚ŒãŸãƒˆãƒ¼ã‚¯ãƒ³ã®æ¬¡ã®æ–‡å­—ã®ä½ç½® *)
 let last_pos = ref 0 (* the end of the last valid lexeme *)
 
-(* ¥¨¥é¡¼½ĞÎÏ *)
+(* ã‚¨ãƒ©ãƒ¼å‡ºåŠ› *)
 let report_error pos =
   print_string ("invalid token at position"^(string_of_int pos)^"\n")
 
-(* ºÇ¸å¤ËÇ§¼±¤µ¤ì¤¿¥È¡¼¥¯¥ó¤ËÁêÅö¤¹¤ëÊ¸»úÎó¡Êlexeme¡Ë *)
+(* æœ€å¾Œã«èªè­˜ã•ã‚ŒãŸãƒˆãƒ¼ã‚¯ãƒ³ã«ç›¸å½“ã™ã‚‹æ–‡å­—åˆ—ï¼ˆlexemeï¼‰ *)
 let get_lexeme() =
   let len = !last_pos - !pos_start in String.sub !input_buffer !pos_start len
 
-(* ¥È¡¼¥¯¥ó¤òÉ½¼¨ *)
+(* ãƒˆãƒ¼ã‚¯ãƒ³ã‚’è¡¨ç¤º *)
 let output_token token =
   match token with
    EQ -> print_string "EQ "
@@ -41,19 +41,19 @@ let output_token token =
  | ID -> print_string ("ID("^(get_lexeme())^") ")
  | INVALID -> assert false
 
-(* °ìÊ¸»úÆÉ¤ß¤³¤à *)
+(* ä¸€æ–‡å­—èª­ã¿ã“ã‚€ *)
 type state = int
 let rec readc (st: state) =
   let c = !input_buffer.[!pos_current] in
    (pos_current:= !pos_current+1; 
-    if st=0 && c=' ' then (* ¶õÇò¤Î½èÍı¤Ï¾õÂÖ 0 ¤Î¤ßÆÃÊÌ°·¤¤ *)
+    if st=0 && c=' ' then (* ç©ºç™½ã®å‡¦ç†ã¯çŠ¶æ…‹ 0 ã®ã¿ç‰¹åˆ¥æ‰±ã„ *)
         (pos_start := !pos_start+1; readc st)
     else c)
 
-(* ¥Ş¥Ã¥Á¤·¤¿¥È¡¼¥¯¥ó¤È¤½¤Î¾ì½ê¤òÊİÂ¸ *)
+(* ãƒãƒƒãƒã—ãŸãƒˆãƒ¼ã‚¯ãƒ³ã¨ãã®å ´æ‰€ã‚’ä¿å­˜ *)
 let save token = (last_token := token; last_pos := !pos_current)
 
-(* ¥ª¡¼¥È¥Ş¥È¥ó¤ÎÁ«°Ü¥Æ¡¼¥Ö¥ë *)
+(* ã‚ªãƒ¼ãƒˆãƒãƒˆãƒ³ã®é·ç§»ãƒ†ãƒ¼ãƒ–ãƒ« *)
 let trtab: (char -> state * token) array =
   [| (fun c -> 
        match c with
@@ -89,10 +89,10 @@ let trtab: (char -> state * token) array =
            else (-2, INVALID))
  |]
 
-(* Á«°ÜÉ½¤ò»²¾È¤¹¤ë´Ø¿ô *)
+(* é·ç§»è¡¨ã‚’å‚ç…§ã™ã‚‹é–¢æ•° *)
 let lookup_tab (st: state) (c: char): state * token = (trtab.(st)) c
 
-(* ¥á¥¤¥ó *)
+(* ãƒ¡ã‚¤ãƒ³ *)
 let rec main (input: string) =
    input_buffer := (input^"\000");
    pos_start := 0; pos_current := 0; last_token := INVALID;
